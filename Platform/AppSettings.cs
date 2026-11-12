@@ -34,6 +34,9 @@ public sealed class AppSettings
 
     public bool SuppressExplorerWindow { get; set; } = true;
 
+    /// <summary>When true, scrcpy mirrors with the phone screen left on (smoother than screen-off).</summary>
+    public bool MirrorKeepScreenOn { get; set; }
+
     public Dictionary<string, int> PhoneAppVolumes { get; set; } = new();
 
     public static string DirectoryPath { get; } = Path.Combine(

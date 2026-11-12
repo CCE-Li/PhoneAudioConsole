@@ -35,6 +35,8 @@
                     Margin="0,14,0,0" Padding="12,6" Click="Mirror_Click" />
             <TextBlock Text="手机屏幕熄灭，仍可在电脑上的 scrcpy 窗口里操作手机（需 USB/WiFi 已连接）"
                        Foreground="#8A8A8A" FontSize="11" Margin="0,4,0,0" TextWrapping="Wrap" />
+            <CheckBox x:Name="MirrorKeepScreenCheck" Content="镜像时保持手机亮屏（更流畅，约 60→更高帧）"
+                      Margin="0,8,0,0" Click="MirrorKeepScreen_Click" />
 
             <CheckBox x:Name="AutoTakeoverCheck" Content="接入后自动接管手机音频" Margin="0,12,0,0" Click="AutoTakeover_Click" />
             <CheckBox x:Name="MuteOnTakeoverCheck" Content="接管时把手机媒体音量置 0（拔出后保持静音）" Margin="0,8,0,0" Click="MuteOnTakeover_Click" />

@@ -132,6 +132,7 @@ public partial class SettingsWindow : Window
         bool mirroring = _controller.IsMirroring;
         MirrorButton.Content = mirroring ? "关闭息屏控制（scrcpy）" : "开启息屏控制（scrcpy）";
         MirrorButton.IsEnabled = mirroring || _controller.CanMirror;
+        MirrorKeepScreenCheck.IsChecked = _controller.MirrorKeepScreenOn;
 
         _updating = true;
         DeviceVolumeSlider.Value = _controller.DeviceVolume;
@@ -252,6 +253,9 @@ public partial class SettingsWindow : Window
     }
 
     private void Mirror_Click(object sender, RoutedEventArgs e) => _controller.ToggleMirror();
+
+    private void MirrorKeepScreen_Click(object sender, RoutedEventArgs e) =>
+        _controller.MirrorKeepScreenOn = MirrorKeepScreenCheck.IsChecked == true;
 
     private void UpdateScopeAvailability()
     {

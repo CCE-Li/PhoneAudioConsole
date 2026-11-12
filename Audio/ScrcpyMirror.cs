@@ -37,7 +37,7 @@ public sealed class ScrcpyMirror : IDisposable
         }
     }
 
-    public void Start(string serial, bool turnScreenOff = true)
+    public void Start(string serial, bool turnScreenOff = true, string bitRate = "16M")
     {
         if (IsRunning)
         {
@@ -66,7 +66,7 @@ public sealed class ScrcpyMirror : IDisposable
             CreateNoWindow = true,
             WorkingDirectory = directory
         };
-        foreach (string argument in new[] { "-s", serial, "--no-audio", "--stay-awake" })
+        foreach (string argument in new[] { "-s", serial, "--no-audio", "--stay-awake", "-b", bitRate })
         {
             startInfo.ArgumentList.Add(argument);
         }
@@ -82,7 +82,17 @@ public sealed class ScrcpyMirror : IDisposable
         _process = Process.Start(startInfo) ?? throw new IOException("无法启动 scrcpy。");
         _process.EnableRaisingEvents = true;
         _process.Exited += (_, _) => _log?.Invoke("scrcpy exited");
-        _log?.Invoke($"scrcpy started for {serial} (screen {(turnScreenOff ? "off" : "on")})");
+        try
+        {
+            // Slightly above normal so encoder/render hiccups from other apps don't cause stutter.
+            _process.PriorityClass = ProcessPriorityClass.AboveNormal;
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception)
+        {
+            // Priority is best-effort.
+        }
+
+        _log?.Invoke($"scrcpy started for {serial} (screen {(turnScreenOff ? "off" : "on")}, bitrate {bitRate})");
     }
 
     public void Stop()

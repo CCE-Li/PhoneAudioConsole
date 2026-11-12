@@ -12,7 +12,7 @@
     <RootNamespace>PhoneAudioConsole</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <!-- The audio library lives in a subfolder; keep its sources out of this project's globs. -->
     <DefaultItemExcludes>$(DefaultItemExcludes);Audio/**</DefaultItemExcludes>
   </PropertyGroup>

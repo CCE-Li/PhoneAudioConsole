@@ -324,7 +324,7 @@ public sealed class PhoneAudioController : IAsyncDisposable
 
         try
         {
-            _mirror.Start(serial);
+            _mirror.Start(serial, turnScreenOff: !_settings.MirrorKeepScreenOn);
             SetStatus("已开启息屏控制（scrcpy 窗口）");
         }
         catch (Exception ex)
@@ -338,6 +338,22 @@ public sealed class PhoneAudioController : IAsyncDisposable
     public bool IsMirroring => _mirror.IsRunning;
 
     public bool CanMirror => _targetSerial is not null && _connection != ConnectionMode.Bluetooth;
+
+    public bool MirrorKeepScreenOn
+    {
+        get => _settings.MirrorKeepScreenOn;
+        set
+        {
+            if (_settings.MirrorKeepScreenOn == value)
+            {
+                return;
+            }
+
+            _settings.MirrorKeepScreenOn = value;
+            _settings.Save();
+            Changed?.Invoke();
+        }
+    }
 
     public void LogMessage(string line) => Log(line);
 
