@@ -42,10 +42,12 @@ public sealed class PhoneAudioController : IAsyncDisposable
     private readonly Dictionary<string, long> _lastSeen = new(StringComparer.Ordinal);
     private readonly ExplorerWindowSuppressor _explorerSuppressor;
     private readonly BluetoothSink _bluetooth;
+    private readonly ScrcpyMirror _mirror;
     private readonly string _logPath;
 
     private long _lastBootstrapTicks;
     private int _bluetoothVolume = 100;
+    private string? _targetSerial;
 
     private Task? _watch;
     private ConnectionMode _connection;
@@ -78,6 +80,7 @@ public sealed class PhoneAudioController : IAsyncDisposable
         _bluetooth = new BluetoothSink(Log);
         _bluetooth.Changed += RaiseChanged;
         _bluetoothVolume = settings.PhoneVolume;
+        _mirror = new ScrcpyMirror(_adb, Log);
 
         _deviceSession = new PhoneCaptureSession(
             () => new ScrcpyAudioTransport(_adb, CaptureScope.Device, log: Log),
@@ -143,6 +146,7 @@ public sealed class PhoneAudioController : IAsyncDisposable
             }
 
             _ = Task.Run(TeardownAsync);
+            _mirror.Stop();
             Changed?.Invoke();
         }
     }
@@ -301,6 +305,40 @@ public sealed class PhoneAudioController : IAsyncDisposable
         Changed?.Invoke();
     }
 
+    public void ToggleMirror()
+    {
+        if (_mirror.IsRunning)
+        {
+            _mirror.Stop();
+            SetStatus("已关闭息屏控制");
+            Changed?.Invoke();
+            return;
+        }
+
+        string? serial = _targetSerial;
+        if (serial is null || _connection == ConnectionMode.Bluetooth)
+        {
+            SetStatus("息屏控制需要先连接手机（USB/WiFi）");
+            return;
+        }
+
+        try
+        {
+            _mirror.Start(serial);
+            SetStatus("已开启息屏控制（scrcpy 窗口）");
+        }
+        catch (Exception ex)
+        {
+            SetStatus("息屏控制启动失败：" + ex.Message);
+        }
+
+        Changed?.Invoke();
+    }
+
+    public bool IsMirroring => _mirror.IsRunning;
+
+    public bool CanMirror => _targetSerial is not null && _connection != ConnectionMode.Bluetooth;
+
     public void LogMessage(string line) => Log(line);
 
     public void Start()
@@ -384,6 +422,7 @@ public sealed class PhoneAudioController : IAsyncDisposable
 
         if (target == null)
         {
+            _targetSerial = null;
             await TeardownAsync().ConfigureAwait(false);
             SetStatus(devices.Any(d => d.State == "unauthorized") ? "手机待授权（请在手机上允许 USB 调试）"
                 : devices.Any(d => d.State == "offline") ? "手机离线（请重新插拔或重新配对）"
@@ -392,6 +431,7 @@ public sealed class PhoneAudioController : IAsyncDisposable
             return;
         }
 
+        _targetSerial = target.Serial;
         await SweepStaleArtifactsAsync(target, token).ConfigureAwait(false);
 
         if (_scope == CaptureScope.Device)
@@ -817,6 +857,7 @@ public sealed class PhoneAudioController : IAsyncDisposable
         }
 
         await TeardownAsync().ConfigureAwait(false);
+        _mirror.Dispose();
         await _deviceSession.DisposeAsync().ConfigureAwait(false);
         await _perApp.DisposeAsync().ConfigureAwait(false);
         await _bluetooth.DisposeAsync().ConfigureAwait(false);

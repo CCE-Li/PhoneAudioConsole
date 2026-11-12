@@ -20,6 +20,8 @@
     <EmbeddedResource Include="AndroidRuntime.files.json" LogicalName="SonicRoute.AndroidAudio.AndroidRuntime.files.json" />
     <EmbeddedResource Include="Runtime/*" Exclude="Runtime/*.txt" LogicalName="SonicRoute.AndroidRuntime.%(Filename)%(Extension)" />
     <EmbeddedResource Include="Runtime/*.txt" LogicalName="SonicRoute.Notices.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Runtime/VirtualDisplay/*" Exclude="Runtime/VirtualDisplay/*.txt" LogicalName="SonicRoute.AndroidRuntime.VirtualDisplay.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Runtime/VirtualDisplay/*.txt" LogicalName="SonicRoute.Notices.VirtualDisplay.%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

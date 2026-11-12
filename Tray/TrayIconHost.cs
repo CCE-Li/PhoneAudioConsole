@@ -17,6 +17,7 @@ internal sealed class TrayIconHost : IDisposable
     private readonly Forms.ToolStripMenuItem _autoTakeoverItem;
     private readonly Forms.ToolStripMenuItem _statusItem;
     private readonly Forms.ToolStripMenuItem _muteItem;
+    private readonly Forms.ToolStripMenuItem _mirrorItem;
     private SettingsWindow? _window;
 
     public event Action? RequestExit;
@@ -46,11 +47,18 @@ internal sealed class TrayIconHost : IDisposable
             Checked = controller.MutedAll
         };
 
+        _mirrorItem = new Forms.ToolStripMenuItem("息屏控制手机 (scrcpy)", null, (_, _) => _controller.ToggleMirror())
+        {
+            CheckOnClick = true,
+            Checked = controller.IsMirroring
+        };
+
         var menu = new Forms.ContextMenuStrip();
         menu.Items.Add(_statusItem);
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add(new Forms.ToolStripMenuItem("打开设置", null, (_, _) => ShowSettings()));
         menu.Items.Add(_muteItem);
+        menu.Items.Add(_mirrorItem);
         menu.Items.Add(_autoTakeoverItem);
         menu.Items.Add(_autoStartItem);
         menu.Items.Add(new Forms.ToolStripSeparator());
@@ -79,6 +87,8 @@ internal sealed class TrayIconHost : IDisposable
         _statusItem.Text = status;
         _icon.Text = status.Length > 60 ? status[..60] : status;
         _muteItem.Checked = _controller.MutedAll;
+        _mirrorItem.Checked = _controller.IsMirroring;
+        _mirrorItem.Enabled = _controller.IsMirroring || _controller.CanMirror;
     }
 
     private void OnToggleAutoTakeover(object? sender, EventArgs e)

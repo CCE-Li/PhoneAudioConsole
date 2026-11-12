@@ -129,6 +129,10 @@ public partial class SettingsWindow : Window
     {
         StatusText.Text = _controller.Status;
 
+        bool mirroring = _controller.IsMirroring;
+        MirrorButton.Content = mirroring ? "关闭息屏控制（scrcpy）" : "开启息屏控制（scrcpy）";
+        MirrorButton.IsEnabled = mirroring || _controller.CanMirror;
+
         _updating = true;
         DeviceVolumeSlider.Value = _controller.DeviceVolume;
         DeviceVolumeText.Text = $"{_controller.DeviceVolume}%";
@@ -246,6 +250,8 @@ public partial class SettingsWindow : Window
 
         _controller.Scope = ScopeDeviceRadio.IsChecked == true ? CaptureScope.Device : CaptureScope.Application;
     }
+
+    private void Mirror_Click(object sender, RoutedEventArgs e) => _controller.ToggleMirror();
 
     private void UpdateScopeAvailability()
     {
