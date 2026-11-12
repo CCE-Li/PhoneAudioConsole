@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PlatformTarget>x64</PlatformTarget>
+    <RootNamespace>PhoneAudioConsole.Audio</RootNamespace>
+    <AssemblyName>PhoneAudioConsole.Audio</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Concentus" Version="2.2.2" />
+    <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Vendored from SonicRoute (MIT). Files under Vendor/ are byte-identical, so the
+         resource logical names below must match the literals inside AndroidRuntimeBundle.cs. -->
+    <EmbeddedResource Include="AndroidRuntime.files.json" LogicalName="SonicRoute.AndroidAudio.AndroidRuntime.files.json" />
+    <EmbeddedResource Include="Runtime/*" Exclude="Runtime/*.txt" LogicalName="SonicRoute.AndroidRuntime.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Runtime/*.txt" LogicalName="SonicRoute.Notices.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>
